@@ -81,9 +81,7 @@ namespace twitch2tuner
             Tv tv = new Tv();
 
             foreach (Channel channel in await ChannelManager.UpdateChannels(UpdateChannelMode.Status))
-            {
-                if (!channel.IsLive) continue;
-                
+            {                
                 tv.Channels.Add(new EPG.Channel
                 {
                     Id = channel.DisplayName,
@@ -213,4 +211,5 @@ namespace twitch2tuner
         private static readonly Dictionary<string, string> StreamUrlMap = new Dictionary<string, string>();
     }
 }
+
 
