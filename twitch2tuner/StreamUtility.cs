@@ -76,6 +76,30 @@ namespace twitch2tuner
         public static StreamUtility Instance { get; set; } = new YoutubeDl();
     }
 
+        public class FFmpeg : StreamUtility
+    {
+        /// <inheritdoc/>
+        public override string Name => "ffmpeg";
+
+        /// <inheritdoc/>
+        public override string GetStreamUrl(string channelUrl)
+        {
+            // Reuse youtube-dl for URL discovery
+            return YoutubeDl.Instance.GetStreamUrl(channelUrl);
+        }
+
+        /// <inheritdoc/>
+        public override Process StartStreamProcess(string streamUrl)
+        {
+            // Use ffmpeg to remux the stream into MPEG-TS for Plex compatibility
+            // -c copy ensures zero CPU overhead for transcoding
+            Process ffmpegProcess = base.StartProcess("ffmpeg", $"-hide_banner -loglevel error -i \"{streamUrl}\" -c copy -f mpegts -map 0:v -map 0:a? -metadata service_provider=\"twitch2tuner\" -metadata service_name=\"Twitch\" pipe:1");
+            return ffmpegProcess;
+        }
+
+        public static StreamUtility Instance { get; set; } = new FFmpeg();
+    }
+
     public class Streamlink : StreamUtility
     {
         /// <inheritdoc/>
@@ -107,3 +131,4 @@ namespace twitch2tuner
         public static StreamUtility Instance { get; set; } = new Streamlink();
     }
 }
+
